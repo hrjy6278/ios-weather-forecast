@@ -12,11 +12,11 @@
 
 ## 목차
 
-1. [**기능구현**](I.-기능-구현)
-2. [**이를 위한 설계**](II.-이를-위한-설계)
-3. [**Trouble Shooting**](III.-트러블-슈팅)
-4. [**아쉽거나 해결하지 못한 부분**](IV.-해결하지-못한-문제)
-5. [**관련 학습내용**](V.-관련-학습-내용)
+1. [**기능구현**](#I.-기능-구현)
+2. [**이를 위한 설계**](#II.-이를-위한-설계)
+3. [**Trouble Shooting**](#III.-트러블-슈팅)
+4. [**아쉽거나 해결하지 못한 부분**](#IV.-해결하지-못한-문제)
+5. [**관련 학습내용**](#V.-관련-학습-내용)
 
 ## I. 기능 구현
 ### 날씨정보 (전)
@@ -37,7 +37,7 @@
 <details>
 <summary>NetworkManager(네트워크 모델) 타입 코드</summary>
     
-```swift=
+```swift
 enum NetworkError: Error {
     case invalidRequest
     case invalidResponse
@@ -151,7 +151,7 @@ func createURL<T: Query>(API: API, queryItems: [T: String]) -> URL? {
     
 ### 현재 위치정보의 날씨 타입 코드
     
-```swift=
+```swift
 struct CurrentWeather: Decodable {
     let weather: [Weather]
     var main: Main
@@ -209,7 +209,7 @@ struct CurrentWeather: Decodable {
     
 ### FiveDaysWeather 타입 코드
     
-```swift=
+```swift
 struct FiveDaysWeather: Decodable {
 let list: [List]
 
@@ -432,7 +432,7 @@ UI에 보여질 부분만 사용하도록 `Model` 타입을 수정하였다. 필
 <details>
 <summary> Model init시 데이터를 가공하는 코드</summary>
 
-```swift=
+```swift
 init(from decoder: Decoder) throws {
     let values = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -457,7 +457,7 @@ init(from decoder: Decoder) throws {
 <details>
 <summary>코드</summary>
 
-```swift=
+```swift
 final class WeatherNetworkManager: NetworkManager {
     func weatherIconImageDataTask(url: URL, completion: @escaping (UIImage) -> Void) {
 
@@ -489,7 +489,7 @@ final class WeatherNetworkManager: NetworkManager {
 <details>
 <summary>코드</summary>
 
-```swift=
+```swift
   let weatherTaskGroup = DispatchGroup()
         
 DispatchQueue.global().async(group: weatherTaskGroup) {
@@ -548,7 +548,7 @@ weatherTaskGroup.notify(queue: DispatchQueue.global()) { [weak self] in
 - ViewModel에 대한 인터페이스를 만들어 해당 프로토콜을 채택한 타입은 **Input**, **Output** 을 구현하도록 설계하였다.
 - Output은 `delegate` 패턴을 사용하였다. 
 - View가 사용자의 액션을 받았을 때는 `ViewModel` `action` 메서드를 활용하여 `ViewModel`이 적절히 처리할 수 있도록 생각하고 설계하였다. 
-```swift=
+```swift
 // ViewModel Protocol
 Protocol ViewModel {
     associatedtype Input
@@ -757,7 +757,7 @@ extention WeatherViewController: WeatherViewModelDelegete {
 
 <details>
 
-```swift=
+```swift
 class Observable<T> {
    private var completion: ((T?) -> Void)?
     
@@ -785,7 +785,7 @@ class Observable<T> {
 
 <details>
 
-```swift=
+```swift
     override func viewDidLoad() {  
         weatherModel.currentData.bind { [weak self] currentWeather in
             guard let self = self else { return }
@@ -812,7 +812,7 @@ class Observable<T> {
 - **Output**은 `ViewModel` 이 `View`에게 `View` 를 그리는 데이터를 넘겨주는 역활을 담당한다.
 
 - `Protocol` 로 `ViewModel` 을 정의해주었다. 이때는 **연관타입**을 작성하여, 유연한 타입을 사용 할 수 있게한다.
-```swift=
+```swift
 protocol ViewModel {
     associatedtype Input
     associatedtype Output
@@ -825,7 +825,7 @@ protocol ViewModel {
 
 - 날씨정보 뷰를 담당할 ViewModel의 Input, Output을 구현한다.
 
-```swift=
+```swift
 //View Model의 Input
 enum WeatherViewModelAction {
     case refresh
@@ -838,7 +838,7 @@ protocol WeatherViewModelDelegete: AnyObject {
 ```
 
 - 이후 날씨정보를 담당할 `ViewModel`을 만든다. 
-```swift=
+```swift
 final class WeatherTableViewModel: ViewModel {
     typealias Input = WeatherViewModelAction
     typealias Output = WeatherViewModelDelegete
@@ -862,7 +862,7 @@ final class WeatherTableViewModel: ViewModel {
 
 - `View`에서는 단지 `Model Data`를 받아 그리는 역활만 담당하게 된다. `Delegate`를 통하여 그릴 데이터들을 주입받고, 데이터들을 화면에 표시하게 해준다.
 
-```swift=
+```swift
 // MARK: - ViewModel Delegate
 extension WeatherViewController: WeatherViewModelDelegete {
     func setViewContents(_ current: CurrentWeather?, _ fiveDays: FiveDaysWeather?) {
@@ -877,7 +877,7 @@ extension WeatherViewController: WeatherViewModelDelegete {
 
 - View에서 사용자의 이벤트를 받았을때 ViewModel action 메서드를 활용하여 넘겨준다.
 
-```swift=
+```swift
     @objc func updateWeather() {
         WeatherViewModel.action(.refresh)
         weatherTableView.refreshControl?.endRefreshing()
@@ -888,7 +888,7 @@ extension WeatherViewController: WeatherViewModelDelegete {
 #### 테이블 뷰 셀의 크기가 없다는 에러
 <details>
 
-```swift=
+```swift
 [Warning] Warning once only: Detected a case where constraints 
 ambiguously suggest a height of zero for a table view cell's content view. 
 We're considering the collapse unintentional and using standard height instead.
