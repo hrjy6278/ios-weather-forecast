@@ -903,7 +903,7 @@ We're considering the collapse unintentional and using standard height instead.
 
 #### 소수점 첫번째 자리가 0일시 생략되는 에러
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/94bd4195-d58c-438d-9475-f8141f61aff3/KakaoTalk_Photo_2021-10-13-17-36-16.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAT73L2G45O3KS52Y5%2F20211024%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20211024T052918Z&X-Amz-Expires=86400&X-Amz-Signature=35a395a4e6da52e678cfc2e41ad465bd6cb120c7be134452e1d12d879c55780d&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22KakaoTalk_Photo_2021-10-13-17-36-16.png%22)
+![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/94bd4195-d58c-438d-9475-f8141f61aff3/KakaoTalk_Photo_2021-10-13-17-36-16.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20211127%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20211127T054619Z&X-Amz-Expires=86400&X-Amz-Signature=680a10dda0275a3712e45b83b68c115b6fccd27ec7ef383b7f516fc700ded9ab&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22KakaoTalk_Photo_2021-10-13-17-36-16.png%22&x-id=GetObject)
 
 
 - 그림과 같이 Double값이 **17.0**일때 **17**로만 표기가 된다. 하지만 요구사항에서는 **17.0** 으로 보이는 상황.
@@ -913,9 +913,24 @@ We're considering the collapse unintentional and using standard height instead.
 <br>
 
 #### 리프레쉬 컨트롤 사용시 데이터가 제대로 불러오지 않는 증상
-![image alt](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/8974d1f2-03e5-4281-8473-037374907ed6/Simulator_Screen_Recording_-_iPhone_12_-_2021-10-17_at_14.04.47.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAT73L2G45O3KS52Y5%2F20211024%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20211024T053532Z&X-Amz-Expires=86400&X-Amz-Signature=c578f4dc57260c59a9108ea54c51feef2b8ff3e1c24ae5eed9ca6a3c13ef3222&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Simulator%2520Screen%2520Recording%2520-%2520iPhone%252012%2520-%25202021-10-17%2520at%252014.04.47.gif%22)
+![image alt](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/8974d1f2-03e5-4281-8473-037374907ed6/Simulator_Screen_Recording_-_iPhone_12_-_2021-10-17_at_14.04.47.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20211127%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20211127T054706Z&X-Amz-Expires=86400&X-Amz-Signature=f8e1f85b0a107b666c9b6ce6550f401d34accc5332a7b465da808cbb61096948&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Simulator%2520Screen%2520Recording%2520-%2520iPhone%252012%2520-%25202021-10-17%2520at%252014.04.47.gif%22&x-id=GetObject)
 
 - 리프레쉬 컨트롤이 작동하게 되면 `CoreLocationManager`를 통해 `requestLocations` 메소드를 실행하게 된다. 하지만 이때 데이터가 제대로 `Task`가 안되는 에러가 있었다.
+
+```swift
+weatherTaskGroup.notify(queue: DispatchQueue.global()) {
+            self.delegate?.didUpdateLocation(currentWeather, fiveDaysWeather)
+        }
+```
+
+- 글로벌 큐에 그룹을 안넣어 주어서 생긴 문제였다.
+
+```swift
+let weatherTaskGroup = DispatchGroup()
+        
+  DispatchQueue.global().async(group: weatherTaskGroup)
+```
+    
 <br>
 <br>
 
@@ -956,8 +971,8 @@ We're considering the collapse unintentional and using standard height instead.
 
 ### 날씨정보 (후)
 
-#### 1. LocationManger Delegate인 locationManager(_:didUpdateLocations)
 <br>
+
 ## V. 관련 학습 내용
 
 <details>
